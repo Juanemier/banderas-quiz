@@ -64,9 +64,14 @@ const result = document.getElementById('result');
 const top3 = document.getElementById('top3');
 const startBtn = () => document.getElementById('start');
 
-function showStart(){
+function setStartText(text){
   const btn = startBtn();
-  if(btn) btn.style.display = 'inline-block';
+  if(btn) btn.textContent = text;
+}
+
+function showStart(text = 'JUGAR'){
+  const btn = startBtn();
+  if(btn){ btn.style.display = 'inline-block'; btn.textContent = text; }
 }
 
 function hideStart(){
@@ -197,7 +202,7 @@ function endGame(){
     } else {
       renderTop3();
       renderTop10();
-      showStart();
+      showStart('Volver a jugar');
     }
   }, 200);
 }

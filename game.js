@@ -60,7 +60,8 @@ let pool = [];
 let currentIndex = 0;
 let score = 0;
 let options = [];
-let ranking = JSON.parse(localStorage.getItem('ranking_v1') || '[]');
+let ranking = [];
+const API_URL = 'http://localhost:3000/api'; // Cambiar si el servidor está en otro lugar
 
 const flagImg = document.getElementById('flag-img');
 const info = document.getElementById('info');
@@ -159,16 +160,27 @@ function endGame(){
   setTimeout(()=>{
     const name = prompt('Introduce tu nombre para el ranking (Top 10):','Jugador');
     if(name){
-      ranking.push({name: name, score: score, total: pool.length, date: new Date().toISOString()});
-      ranking.sort((a,b)=> b.score - a.score || (a.date<b.date?1:-1));
-      ranking = ranking.slice(0,10);
-      localStorage.setItem('ranking_v1', JSON.stringify(ranking));
+      // Enviar ranking al servidor
+      fetch(API_URL + '/ranking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, score: score, total: pool.length })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success){
+          ranking = data.ranking;
+          renderTop3();
+          renderTop10();
+        }
+      })
+      .catch(err => console.error('Error al enviar ranking:', err));
+    } else {
+      renderTop3();
+      renderTop10();
     }
-    renderTop3();
-    renderTop10();
   }, 200);
 }
-
 function renderTop3(){
   const top = ranking.slice(0,3);
   if(top.length===0){ top3.innerHTML = '<em>No hay top aún</em>'; return; }
@@ -179,6 +191,22 @@ function renderTop10(){
   if(ranking.length===0) return;
   const txt = ranking.map((e,i)=>`${i+1}. ${e.name} — ${e.score}/${e.total}`).join('\n');
   alert('Top 10:\n'+txt);
+}
+
+// Cargar ranking desde servidor al iniciar
+async function loadRanking(){
+  try{
+document.getElementById('start').addEventListener('click', startGame);
+document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
+document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
+document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));
+document.getElementById('opt3').addEventListener('click', ()=>handleChoice(3));
+
+// Cargar ranking al iniciar la página
+loadRanking();
+info.textContent = 'Pulsa JUGAR para comenzar';
+  }
+} alert('Top 10:\n'+txt);
 }
 
 document.getElementById('start').addEventListener('click', startGame);

@@ -62,6 +62,21 @@ const flagImg = document.getElementById('flag-img');
 const info = document.getElementById('info');
 const result = document.getElementById('result');
 const top3 = document.getElementById('top3');
+const startBtn = () => document.getElementById('start');
+
+function showStart(){
+  const btn = startBtn();
+  if(btn) btn.style.display = 'inline-block';
+}
+
+function hideStart(){
+  const btn = startBtn();
+  if(btn) btn.style.display = 'none';
+}
+
+function setOptionsEnabled(enabled){
+  document.querySelectorAll('.opt').forEach(b => b.disabled = !enabled);
+}
 
 function shuffle(arr){
   for(let i=arr.length-1; i>0; i--){
@@ -108,6 +123,8 @@ function startGame(){
   score = 0;
   result.textContent = '';
   info.textContent = `Pregunta 1 de ${pool.length}`;
+  hideStart();
+  setOptionsEnabled(true);
   renderTop3();
   showQuestion();
 }
@@ -156,6 +173,7 @@ function endGame(){
   document.getElementById('opt1').textContent = '';
   document.getElementById('opt2').textContent = '';
   document.getElementById('opt3').textContent = '';
+  setOptionsEnabled(false);
   setTimeout(() => {
     const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
     if(name){
@@ -168,14 +186,18 @@ function endGame(){
       .then(data => {
         if(data.success){
           ranking = data.ranking;
-          renderTop3();
-          renderTop10();
         }
       })
-      .catch(err => console.error('Error al enviar ranking:', err));
+      .catch(err => console.error('Error al enviar ranking:', err))
+      .finally(() => {
+        renderTop3();
+        renderTop10();
+        showStart();
+      });
     } else {
       renderTop3();
       renderTop10();
+      showStart();
     }
   }, 200);
 }

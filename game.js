@@ -182,11 +182,12 @@ function endGame(){
 
 function renderTop3(){
   const top = ranking.slice(0, 3);
-  if(top.length === 0){ 
-    top3.innerHTML = '<em>No hay top aún</em>'; 
-    return; 
+  if(top.length === 0){
+    top3.innerHTML = '<h4>Ranking</h4><em>No hay top aún</em>';
+    return;
   }
-  top3.innerHTML = top.map((e, i) => `${i+1}. ${e.name} — ${e.score}`).join('<br>');
+  const lines = top.map((e, i) => `<strong>${i+1}.</strong> ${e.name} — ${e.score}/${e.total}`);
+  top3.innerHTML = `<h4>Ranking</h4>` + lines.join('<br>');
 }
 
 function renderTop10(){

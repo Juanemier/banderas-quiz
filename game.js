@@ -57,7 +57,16 @@ const countries = [
 
 let pool = [], currentIndex = 0, score = 0, options = [];
 let ranking = [];
-const API_URL = 'http://localhost:3000';
+// Compute API_URL dynamically so mobile devices can use the same host when
+// the page is opened via http://<host>:<port>
+let API_URL;
+if(location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'){
+  API_URL = 'http://localhost:3000';
+} else {
+  // Use the page's hostname (works when you serve the static files from the same machine
+  // and access them via http://<DESKTOP_IP>:8000 on your mobile device)
+  API_URL = location.protocol + '//' + location.hostname + ':3000';
+}
 const flagImg = document.getElementById('flag-img');
 const info = document.getElementById('info');
 const result = document.getElementById('result');

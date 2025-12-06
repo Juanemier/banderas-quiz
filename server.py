@@ -138,7 +138,8 @@ class RankingHandler(BaseHTTPRequestHandler):
 
 if __name__ == '__main__':
     PORT = 3000
-    server = HTTPServer(('localhost', PORT), RankingHandler)
+    # Bind to all interfaces so mobile devices on the same LAN can reach the API
+    server = HTTPServer(('', PORT), RankingHandler)
     print(f'Servidor ejecutándose en http://localhost:{PORT}')
     print(f'Ranking se guarda en: {RANKING_FILE}')
     print('Presiona Ctrl+C para detener el servidor')

@@ -58,7 +58,7 @@ const countries = [
 let pool = [], currentIndex = 0, score = 0, options = [];
 let ranking = [];
 const API_URL = 'http://localhost:3000';
-const flagImg = document.getElementById('flag');
+const flagImg = document.getElementById('flag-img');
 const info = document.getElementById('info');
 const result = document.getElementById('result');
 const top3 = document.getElementById('top3');
@@ -159,7 +159,7 @@ function endGame(){
   setTimeout(() => {
     const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
     if(name){
-      fetch(API_URL + '/ranking', {
+      fetch(API_URL + '/api/ranking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, score: score, total: pool.length })
@@ -197,7 +197,7 @@ function renderTop10(){
 
 async function loadRanking(){
   try{
-    const res = await fetch(API_URL + '/ranking');
+    const res = await fetch(API_URL + '/api/ranking');
     ranking = await res.json();
     renderTop3();
   }catch(err){

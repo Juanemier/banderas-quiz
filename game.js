@@ -48,29 +48,28 @@ const countries = [
   { name: "Sint Maarten", code: "sx" }, { name: "Siria", code: "sy" }, { name: "Somalia", code: "so" }, { name: "Sri Lanka", code: "lk" }, { name: "Sudáfrica", code: "za" },
   { name: "Sudán", code: "sd" }, { name: "Sudán del Sur", code: "ss" }, { name: "Suecia", code: "se" }, { name: "Suiza", code: "ch" }, { name: "Surinam", code: "sr" },
   { name: "Tailandia", code: "th" }, { name: "Taiwán", code: "tw" }, { name: "Tanzania", code: "tz" }, { name: "Tayikistán", code: "tj" }, { name: "Territorio Británico del Océano Índico", code: "io" },
-  { name: "Territorios Australes Franceses", code: "tf" }, { name: "Timor Oriental", code: "tl" }, { name: "Togo", code: "tg" }, { name: "Tokelau", code: "tk" }, { name: "Tonga", code: "to" },
-  { name: "Trinidad y Tobago", code: "tt" }, { name: "Túnez", code: "tn" }, { name: "Turkmenistán", code: "tm" }, { name: "Turquía", code: "tr" }, { name: "Tuvalu", code: "tv" },
-  { name: "Ucrania", code: "ua" }, { name: "Uganda", code: "ug" }, { name: "Uruguay", code: "uy" }, { name: "Uzbekistán", code: "uz" }, { name: "Vanuatu", code: "vu" },
-  { name: "Venezuela", code: "ve" }, { name: "Vietnam", code: "vn" }, { name: "Wallis y Futuna", code: "wf" }, { name: "Yemen", code: "ye" }, { name: "Yibuti", code: "dj" },
-  { name: "Zambia", code: "zm" }, { name: "Zimbabue", code: "zw" }
+  { name: "Timor Oriental", code: "tl" }, { name: "Togo", code: "tg" }, { name: "Tokelau", code: "tk" }, { name: "Tonga", code: "to" }, { name: "Trinidad y Tobago", code: "tt" },
+  { name: "Túnez", code: "tn" }, { name: "Turkmenistán", code: "tm" }, { name: "Turquía", code: "tr" }, { name: "Tuvalu", code: "tv" }, { name: "Ucrania", code: "ua" },
+  { name: "Uganda", code: "ug" }, { name: "Uruguay", code: "uy" }, { name: "Uzbekistán", code: "uz" }, { name: "Vanuatu", code: "vu" }, { name: "Venezuela", code: "ve" },
+  { name: "Vietnam", code: "vn" }, { name: "Wallis y Futuna", code: "wf" }, { name: "Yemen", code: "ye" }, { name: "Yibuti", code: "dj" }, { name: "Zambia", code: "zm" },
+  { name: "Zimbabue", code: "zw" }
 ];
 
-// Estado del juego
-let pool = [];
-let currentIndex = 0;
-let score = 0;
-let options = [];
+let pool = [], currentIndex = 0, score = 0, options = [];
 let ranking = [];
-const API_URL = 'http://localhost:3000/api'; // Cambiar si el servidor está en otro lugar
-
-const flagImg = document.getElementById('flag-img');
+const API_URL = 'http://localhost:3000';
+const flagImg = document.getElementById('flag');
 const info = document.getElementById('info');
 const result = document.getElementById('result');
 const top3 = document.getElementById('top3');
 
-function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
+function shuffle(arr){
+  for(let i=arr.length-1; i>0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
 
-// Sonidos con Web Audio API
 function playSuccessSound(){
   try{
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -104,7 +103,7 @@ function playErrorSound(){
 function startGame(){
   pool = [...countries];
   shuffle(pool);
-  pool = pool.slice(0,25);
+  pool = pool.slice(0, 25);
   currentIndex = 0;
   score = 0;
   result.textContent = '';
@@ -141,10 +140,10 @@ function handleChoice(i){
     result.style.color = 'red';
     playErrorSound();
   }
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  setTimeout(()=>{
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  setTimeout(() => {
     currentIndex += 1;
-    document.querySelectorAll('.opt').forEach(b=>b.disabled=false);
+    document.querySelectorAll('.opt').forEach(b => b.disabled = false);
     result.textContent = '';
     showQuestion();
   }, 3000);
@@ -157,10 +156,9 @@ function endGame(){
   document.getElementById('opt1').textContent = '';
   document.getElementById('opt2').textContent = '';
   document.getElementById('opt3').textContent = '';
-  setTimeout(()=>{
-    const name = prompt('Introduce tu nombre para el ranking (Top 10):','Jugador');
+  setTimeout(() => {
+    const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
     if(name){
-      // Enviar ranking al servidor
       fetch(API_URL + '/ranking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -181,39 +179,40 @@ function endGame(){
     }
   }, 200);
 }
+
 function renderTop3(){
-  const top = ranking.slice(0,3);
-  if(top.length===0){ top3.innerHTML = '<em>No hay top aún</em>'; return; }
-  top3.innerHTML = top.map((e,i)=>`${i+1}. ${e.name} — ${e.score}`).join('<br>');
+  const top = ranking.slice(0, 3);
+  if(top.length === 0){ 
+    top3.innerHTML = '<em>No hay top aún</em>'; 
+    return; 
+  }
+  top3.innerHTML = top.map((e, i) => `${i+1}. ${e.name} — ${e.score}`).join('<br>');
 }
 
 function renderTop10(){
-  if(ranking.length===0) return;
-  const txt = ranking.map((e,i)=>`${i+1}. ${e.name} — ${e.score}/${e.total}`).join('\n');
-  alert('Top 10:\n'+txt);
+  if(ranking.length === 0) return;
+  const txt = ranking.map((e, i) => `${i+1}. ${e.name} — ${e.score}/${e.total}`).join('\n');
+  alert('Top 10:\n' + txt);
 }
 
-// Cargar ranking desde servidor al iniciar
 async function loadRanking(){
   try{
-document.getElementById('start').addEventListener('click', startGame);
-document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
-document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
-document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));
-document.getElementById('opt3').addEventListener('click', ()=>handleChoice(3));
-
-// Cargar ranking al iniciar la página
-loadRanking();
-info.textContent = 'Pulsa JUGAR para comenzar';
+    const res = await fetch(API_URL + '/ranking');
+    ranking = await res.json();
+    renderTop3();
+  }catch(err){
+    console.error('Error cargando ranking:', err);
+    ranking = [];
   }
-} alert('Top 10:\n'+txt);
 }
 
-document.getElementById('start').addEventListener('click', startGame);
-document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
-document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
-document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));
-document.getElementById('opt3').addEventListener('click', ()=>handleChoice(3));
-
-renderTop3();
-info.textContent = 'Pulsa JUGAR para comenzar';
+// Esperar a que el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  loadRanking();
+  info.textContent = 'Pulsa JUGAR para comenzar';
+  document.getElementById('start').addEventListener('click', startGame);
+  document.getElementById('opt0').addEventListener('click', () => handleChoice(0));
+  document.getElementById('opt1').addEventListener('click', () => handleChoice(1));
+  document.getElementById('opt2').addEventListener('click', () => handleChoice(2));
+  document.getElementById('opt3').addEventListener('click', () => handleChoice(3));
+});

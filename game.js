@@ -1,6 +1,6 @@
 // Versión simple del Juego de Banderas en JavaScript
 // Usa flagcdn.com para buscar banderas por código alpha-2
-// 254 países y territorios mundiales
+// 240+ países y territorios mundiales
 
 const countries = [
   { name: "Afganistán", code: "af" }, { name: "Albania", code: "al" }, { name: "Alemania", code: "de" }, { name: "Andorra", code: "ad" }, { name: "Angola", code: "ao" },
@@ -22,41 +22,37 @@ const countries = [
   { name: "Ghana", code: "gh" }, { name: "Gibraltar", code: "gi" }, { name: "Granada", code: "gd" }, { name: "Grecia", code: "gr" }, { name: "Groenlandia", code: "gl" },
   { name: "Guadalupe", code: "gp" }, { name: "Guam", code: "gu" }, { name: "Guatemala", code: "gt" }, { name: "Guernsey", code: "gg" }, { name: "Guinea", code: "gn" },
   { name: "Guinea Ecuatorial", code: "gq" }, { name: "Guinea-Bisáu", code: "gw" }, { name: "Guyana", code: "gy" }, { name: "Haití", code: "ht" }, { name: "Honduras", code: "hn" },
-  { name: "Hong Kong", code: "hk" }, { name: "Hungría", code: "hu" }, { name: "Islandia", code: "is" }, { name: "Islas Åland", code: "ax" }, { name: "Islas Bermuda", code: "bm" },
-  { name: "Islas Caimán", code: "ky" }, { name: "Islas Carolina", code: "fm" }, { name: "Islas Cocos", code: "cc" }, { name: "Islas Cook", code: "ck" }, { name: "Islas Feroe", code: "fo" },
-  { name: "Islas Heard", code: "hm" }, { name: "Islas Malvinas", code: "fk" }, { name: "Islas Marianas del Norte", code: "mp" }, { name: "Islas Marshall", code: "mh" }, { name: "Islas Norfolk", code: "nf" },
-  { name: "Islas Pitcairn", code: "pn" }, { name: "Islas Salomón", code: "sb" }, { name: "Islas Turcas y Caicos", code: "tc" }, { name: "Islas Vírgenes Británicas", code: "vg" }, { name: "Islas Vírgenes de EE.UU.", code: "vi" },
-  { name: "India", code: "in" }, { name: "Indonesia", code: "id" }, { name: "Irak", code: "iq" }, { name: "Irán", code: "ir" }, { name: "Irlanda", code: "ie" },
-  { name: "Isla Bouvet", code: "bv" }, { name: "Isla Christmas", code: "cx" }, { name: "Isla de Man", code: "im" }, { name: "Isla Reunión", code: "re" }, { name: "Isla Svalbard", code: "sj" },
-  { name: "Israel", code: "il" }, { name: "Italia", code: "it" }, { name: "Jamaica", code: "jm" }, { name: "Japón", code: "jp" }, { name: "Jersey", code: "je" },
-  { name: "Jordania", code: "jo" }, { name: "Kazajistán", code: "kz" }, { name: "Kenia", code: "ke" }, { name: "Kirguistán", code: "kg" }, { name: "Kiribati", code: "ki" },
-  { name: "Kuwait", code: "kw" }, { name: "Laos", code: "la" }, { name: "Lesoto", code: "ls" }, { name: "Letonia", code: "lv" }, { name: "Líbano", code: "lb" },
-  { name: "Liberia", code: "lr" }, { name: "Libia", code: "ly" }, { name: "Liechtenstein", code: "li" }, { name: "Lituania", code: "lt" }, { name: "Luxemburgo", code: "lu" },
-  { name: "Macao", code: "mo" }, { name: "Macedonia", code: "mk" }, { name: "Madagascar", code: "mg" }, { name: "Malasia", code: "my" }, { name: "Maldivas", code: "mv" },
-  { name: "Mali", code: "ml" }, { name: "Malta", code: "mt" }, { name: "Mariana del Norte", code: "mp" }, { name: "Marruecos", code: "ma" }, { name: "Martinica", code: "mq" },
-  { name: "Mauricio", code: "mu" }, { name: "Mauritania", code: "mr" }, { name: "Mayotte", code: "yt" }, { name: "Medina", code: "sa" }, { name: "Melanesia", code: "sb" },
-  { name: "Méjico", code: "mx" }, { name: "Menorca", code: "es" }, { name: "Mérida", code: "mx" }, { name: "Micronesia", code: "fm" }, { name: "Moldavia", code: "md" },
-  { name: "Mónaco", code: "mc" }, { name: "Mongolia", code: "mn" }, { name: "Montenegro", code: "me" }, { name: "Montserrat", code: "ms" }, { name: "Mozambique", code: "mz" },
-  { name: "Namibia", code: "na" }, { name: "Nauru", code: "nr" }, { name: "Nepal", code: "np" }, { name: "Nicaragua", code: "ni" }, { name: "Níger", code: "ne" },
-  { name: "Nigeria", code: "ng" }, { name: "Niue", code: "nu" }, { name: "Noruega", code: "no" }, { name: "Nueva Caledonia", code: "nc" }, { name: "Nueva Zelanda", code: "nz" },
-  { name: "Omán", code: "om" }, { name: "Países Bajos", code: "nl" }, { name: "Pakistán", code: "pk" }, { name: "Palaos", code: "pw" }, { name: "Palestina", code: "ps" },
-  { name: "Panamá", code: "pa" }, { name: "Papúa Nueva Guinea", code: "pg" }, { name: "Paquistán", code: "pk" }, { name: "Paraguay", code: "py" }, { name: "Perú", code: "pe" },
-  { name: "Polinesia Francesa", code: "pf" }, { name: "Polonia", code: "pl" }, { name: "Polinesia", code: "pf" }, { name: "Portugal", code: "pt" }, { name: "Príncipe de Gales", code: "gb" },
-  { name: "Puerto Rico", code: "pr" }, { name: "Qatar", code: "qa" }, { name: "Quedlinburg", code: "de" }, { name: "República Centroafricana", code: "cf" }, { name: "República Checa", code: "cz" },
-  { name: "República Democrática del Congo", code: "cd" }, { name: "República Dominicana", code: "do" }, { name: "Reunión", code: "re" }, { name: "Reino Unido", code: "gb" }, { name: "Ruanda", code: "rw" },
-  { name: "Rumania", code: "ro" }, { name: "Rusia", code: "ru" }, { name: "Saba", code: "bq" }, { name: "Sahara Occidental", code: "eh" }, { name: "Samoa", code: "ws" },
-  { name: "Samoa Americana", code: "as" }, { name: "San Bartolomé", code: "bq" }, { name: "San Cristóbal y Nieves", code: "kn" }, { name: "San Eustaquio", code: "bq" }, { name: "San Marino", code: "sm" },
-  { name: "San Martín", code: "mf" }, { name: "San Pedro y Miquelón", code: "pm" }, { name: "San Vicente y las Granadinas", code: "vc" }, { name: "Santa Elena", code: "sh" }, { name: "Santa Lucía", code: "lc" },
-  { name: "Santiago", code: "cl" }, { name: "Santo Tomé y Príncipe", code: "st" }, { name: "Senegal", code: "sn" }, { name: "Serbia", code: "rs" }, { name: "Seychelles", code: "sc" },
-  { name: "Siria", code: "sy" }, { name: "Singapur", code: "sg" }, { name: "Sint Maarten", code: "sx" }, { name: "Siria", code: "sy" }, { name: "Soalia", code: "so" },
-  { name: "Somalia", code: "so" }, { name: "Sri Lanka", code: "lk" }, { name: "Sudáfrica", code: "za" }, { name: "Sudán", code: "sd" }, { name: "Sudán del Sur", code: "ss" },
-  { name: "Suecia", code: "se" }, { name: "Suiza", code: "ch" }, { name: "Surinam", code: "sr" }, { name: "Svalbard", code: "sj" }, { name: "Tailandia", code: "th" },
-  { name: "Taiwán", code: "tw" }, { name: "Tanzania", code: "tz" }, { name: "Tayikistán", code: "tj" }, { name: "Territorio Británico del Océano Índico", code: "io" }, { name: "Territorios Australes Franceses", code: "tf" },
-  { name: "Territorios Palestinos", code: "ps" }, { name: "Tetúan", code: "ma" }, { name: "Timor Oriental", code: "tl" }, { name: "Togo", code: "tg" }, { name: "Tokelau", code: "tk" },
-  { name: "Tonga", code: "to" }, { name: "Trinidad y Tobago", code: "tt" }, { name: "Túnez", code: "tn" }, { name: "Turkmenistán", code: "tm" }, { name: "Turquía", code: "tr" },
-  { name: "Tuvalu", code: "tv" }, { name: "Ucrania", code: "ua" }, { name: "Uganda", code: "ug" }, { name: "Ulán Bator", code: "mn" }, { name: "Unión Europea", code: "eu" },
-  { name: "Uruguay", code: "uy" }, { name: "Uzbekistán", code: "uz" }, { name: "Vanuatu", code: "vu" }, { name: "Venezuela", code: "ve" }, { name: "Vietnam", code: "vn" },
-  { name: "Wallis y Futuna", code: "wf" }, { name: "Yemen", code: "ye" }, { name: "Yibuti", code: "dj" }, { name: "Zambia", code: "zm" }, { name: "Zimbabue", code: "zw" }
+  { name: "Hong Kong", code: "hk" }, { name: "Hungría", code: "hu" }, { name: "Islandia", code: "is" }, { name: "Islas Åland", code: "ax" }, { name: "Islas Caimán", code: "ky" },
+  { name: "Islas Carolina", code: "fm" }, { name: "Islas Cook", code: "ck" }, { name: "Islas Feroe", code: "fo" }, { name: "Islas Heard", code: "hm" }, { name: "Islas Malvinas", code: "fk" },
+  { name: "Islas Marianas del Norte", code: "mp" }, { name: "Islas Marshall", code: "mh" }, { name: "Islas Norfolk", code: "nf" }, { name: "Islas Pitcairn", code: "pn" }, { name: "Islas Salomón", code: "sb" },
+  { name: "Islas Turcas y Caicos", code: "tc" }, { name: "Islas Vírgenes Británicas", code: "vg" }, { name: "Islas Vírgenes de EE.UU.", code: "vi" }, { name: "India", code: "in" }, { name: "Indonesia", code: "id" },
+  { name: "Irak", code: "iq" }, { name: "Irán", code: "ir" }, { name: "Irlanda", code: "ie" }, { name: "Isla Bouvet", code: "bv" }, { name: "Isla Christmas", code: "cx" },
+  { name: "Isla de Man", code: "im" }, { name: "Isla Reunión", code: "re" }, { name: "Isla Svalbard", code: "sj" }, { name: "Israel", code: "il" }, { name: "Italia", code: "it" },
+  { name: "Jamaica", code: "jm" }, { name: "Japón", code: "jp" }, { name: "Jersey", code: "je" }, { name: "Jordania", code: "jo" }, { name: "Kazajistán", code: "kz" },
+  { name: "Kenia", code: "ke" }, { name: "Kirguistán", code: "kg" }, { name: "Kiribati", code: "ki" }, { name: "Kuwait", code: "kw" }, { name: "Laos", code: "la" },
+  { name: "Lesoto", code: "ls" }, { name: "Letonia", code: "lv" }, { name: "Líbano", code: "lb" }, { name: "Liberia", code: "lr" }, { name: "Libia", code: "ly" },
+  { name: "Liechtenstein", code: "li" }, { name: "Lituania", code: "lt" }, { name: "Luxemburgo", code: "lu" }, { name: "Macao", code: "mo" }, { name: "Macedonia", code: "mk" },
+  { name: "Madagascar", code: "mg" }, { name: "Malasia", code: "my" }, { name: "Maldivas", code: "mv" }, { name: "Mali", code: "ml" }, { name: "Malta", code: "mt" },
+  { name: "Marruecos", code: "ma" }, { name: "Martinica", code: "mq" }, { name: "Mauricio", code: "mu" }, { name: "Mauritania", code: "mr" }, { name: "Mayotte", code: "yt" },
+  { name: "Méjico", code: "mx" }, { name: "Micronesia", code: "fm" }, { name: "Moldavia", code: "md" }, { name: "Mónaco", code: "mc" }, { name: "Mongolia", code: "mn" },
+  { name: "Montenegro", code: "me" }, { name: "Montserrat", code: "ms" }, { name: "Mozambique", code: "mz" }, { name: "Namibia", code: "na" }, { name: "Nauru", code: "nr" },
+  { name: "Nepal", code: "np" }, { name: "Nicaragua", code: "ni" }, { name: "Níger", code: "ne" }, { name: "Nigeria", code: "ng" }, { name: "Niue", code: "nu" },
+  { name: "Noruega", code: "no" }, { name: "Nueva Caledonia", code: "nc" }, { name: "Nueva Zelanda", code: "nz" }, { name: "Omán", code: "om" }, { name: "Países Bajos", code: "nl" },
+  { name: "Pakistán", code: "pk" }, { name: "Palaos", code: "pw" }, { name: "Palestina", code: "ps" }, { name: "Panamá", code: "pa" }, { name: "Papúa Nueva Guinea", code: "pg" },
+  { name: "Paraguay", code: "py" }, { name: "Perú", code: "pe" }, { name: "Polinesia Francesa", code: "pf" }, { name: "Polonia", code: "pl" }, { name: "Portugal", code: "pt" },
+  { name: "Puerto Rico", code: "pr" }, { name: "República Centroafricana", code: "cf" }, { name: "República Checa", code: "cz" }, { name: "República Democrática del Congo", code: "cd" }, { name: "República Dominicana", code: "do" },
+  { name: "Reino Unido", code: "gb" }, { name: "Ruanda", code: "rw" }, { name: "Rumania", code: "ro" }, { name: "Rusia", code: "ru" }, { name: "Sahara Occidental", code: "eh" },
+  { name: "Samoa", code: "ws" }, { name: "Samoa Americana", code: "as" }, { name: "San Cristóbal y Nieves", code: "kn" }, { name: "San Marino", code: "sm" }, { name: "San Martín", code: "mf" },
+  { name: "San Pedro y Miquelón", code: "pm" }, { name: "San Vicente y las Granadinas", code: "vc" }, { name: "Santa Elena", code: "sh" }, { name: "Santa Lucía", code: "lc" }, { name: "Santo Tomé y Príncipe", code: "st" },
+  { name: "Senegal", code: "sn" }, { name: "Serbia", code: "rs" }, { name: "Seychelles", code: "sc" }, { name: "Sierra Leona", code: "sl" }, { name: "Singapur", code: "sg" },
+  { name: "Sint Maarten", code: "sx" }, { name: "Siria", code: "sy" }, { name: "Somalia", code: "so" }, { name: "Sri Lanka", code: "lk" }, { name: "Sudáfrica", code: "za" },
+  { name: "Sudán", code: "sd" }, { name: "Sudán del Sur", code: "ss" }, { name: "Suecia", code: "se" }, { name: "Suiza", code: "ch" }, { name: "Surinam", code: "sr" },
+  { name: "Tailandia", code: "th" }, { name: "Taiwán", code: "tw" }, { name: "Tanzania", code: "tz" }, { name: "Tayikistán", code: "tj" }, { name: "Territorio Británico del Océano Índico", code: "io" },
+  { name: "Territorios Australes Franceses", code: "tf" }, { name: "Timor Oriental", code: "tl" }, { name: "Togo", code: "tg" }, { name: "Tokelau", code: "tk" }, { name: "Tonga", code: "to" },
+  { name: "Trinidad y Tobago", code: "tt" }, { name: "Túnez", code: "tn" }, { name: "Turkmenistán", code: "tm" }, { name: "Turquía", code: "tr" }, { name: "Tuvalu", code: "tv" },
+  { name: "Ucrania", code: "ua" }, { name: "Uganda", code: "ug" }, { name: "Uruguay", code: "uy" }, { name: "Uzbekistán", code: "uz" }, { name: "Vanuatu", code: "vu" },
+  { name: "Venezuela", code: "ve" }, { name: "Vietnam", code: "vn" }, { name: "Wallis y Futuna", code: "wf" }, { name: "Yemen", code: "ye" }, { name: "Yibuti", code: "dj" },
+  { name: "Zambia", code: "zm" }, { name: "Zimbabue", code: "zw" }
 ];
 
 // Estado del juego
@@ -75,55 +71,56 @@ function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.rando
 
 // Sonidos con Web Audio API
 function playSuccessSound(){
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.frequency.value = 800;
-  gain.gain.setValueAtTime(0.3, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.3);
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 800;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.3);
+  }catch(e){}
 }
 
 function playErrorSound(){
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.frequency.value = 300;
-  gain.gain.setValueAtTime(0.3, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.4);
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 300;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  }catch(e){}
 }
 
 function startGame(){
-function handleChoice(i){
-  const chosen = options[i];
-  const correct = pool[currentIndex];
-  if(chosen.name === correct.name){
-    score += 1;
-    result.textContent = '¡CORRECTO!';
-    result.style.color = 'green';
-    playSuccessSound();
-  } else {
-    result.textContent = `INCORRECTO — Era: ${correct.name}`;
-    result.style.color = 'red';
-    playErrorSound();
-  }
-  // bloquear botones
-  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  // pasar a la siguiente después de 3 segundos
-  setTimeout(()=>{
-    currentIndex += 1;
-    document.querySelectorAll('.opt').forEach(b=>b.disabled=false);
-    result.textContent = '';
-    showQuestion();
-  }, 3000);
-} document.getElementById('opt0').textContent = options[0].name;
+  pool = [...countries];
+  shuffle(pool);
+  pool = pool.slice(0,25);
+  currentIndex = 0;
+  score = 0;
+  result.textContent = '';
+  info.textContent = `Pregunta 1 de ${pool.length}`;
+  renderTop3();
+  showQuestion();
+}
+
+function showQuestion(){
+  if(currentIndex >= pool.length){ endGame(); return; }
+  const item = pool[currentIndex];
+  flagImg.src = `https://flagcdn.com/w320/${item.code}.png`;
+  let others = countries.filter(c => c.name !== item.name);
+  shuffle(others);
+  options = [item, others[0], others[1], others[2]];
+  shuffle(options);
+  document.getElementById('opt0').textContent = options[0].name;
   document.getElementById('opt1').textContent = options[1].name;
   document.getElementById('opt2').textContent = options[2].name;
   document.getElementById('opt3').textContent = options[3].name;
@@ -137,13 +134,13 @@ function handleChoice(i){
     score += 1;
     result.textContent = '¡CORRECTO!';
     result.style.color = 'green';
+    playSuccessSound();
   } else {
     result.textContent = `INCORRECTO — Era: ${correct.name}`;
     result.style.color = 'red';
+    playErrorSound();
   }
-  // bloquear botones
   document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
-  // pasar a la siguiente después de 3 segundos
   setTimeout(()=>{
     currentIndex += 1;
     document.querySelectorAll('.opt').forEach(b=>b.disabled=false);
@@ -158,7 +155,7 @@ function endGame(){
   document.getElementById('opt0').textContent = '';
   document.getElementById('opt1').textContent = '';
   document.getElementById('opt2').textContent = '';
-  // pedir nombre
+  document.getElementById('opt3').textContent = '';
   setTimeout(()=>{
     const name = prompt('Introduce tu nombre para el ranking (Top 10):','Jugador');
     if(name){
@@ -179,19 +176,16 @@ function renderTop3(){
 }
 
 function renderTop10(){
-  // Mostrar una alerta con top10
   if(ranking.length===0) return;
   const txt = ranking.map((e,i)=>`${i+1}. ${e.name} — ${e.score}/${e.total}`).join('\n');
   alert('Top 10:\n'+txt);
 }
 
-// Event listeners
 document.getElementById('start').addEventListener('click', startGame);
 document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
 document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
 document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));
 document.getElementById('opt3').addEventListener('click', ()=>handleChoice(3));
 
-// Inicializar UI
 renderTop3();
 info.textContent = 'Pulsa JUGAR para comenzar';

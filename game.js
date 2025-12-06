@@ -73,28 +73,57 @@ const top3 = document.getElementById('top3');
 
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
 
-function startGame(){
-  pool = [...countries];
-  shuffle(pool);
-  pool = pool.slice(0,25);
-  currentIndex = 0;
-  score = 0;
-  result.textContent = '';
-  info.textContent = `Pregunta 1 de ${pool.length}`;
-  renderTop3();
-  showQuestion();
+// Sonidos con Web Audio API
+function playSuccessSound(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = 800;
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.3);
 }
 
-function showQuestion(){
-  if(currentIndex >= pool.length){ endGame(); return; }
-  const item = pool[currentIndex];
-  flagImg.src = `https://flagcdn.com/w320/${item.code}.png`;
-  // Generar 4 opciones (1 correcta + 3 aleatorias)
-  let others = countries.filter(c => c.name !== item.name);
-  shuffle(others);
-  options = [item, others[0], others[1], others[2]];
-  shuffle(options);
-  document.getElementById('opt0').textContent = options[0].name;
+function playErrorSound(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.frequency.value = 300;
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.4);
+}
+
+function startGame(){
+function handleChoice(i){
+  const chosen = options[i];
+  const correct = pool[currentIndex];
+  if(chosen.name === correct.name){
+    score += 1;
+    result.textContent = '¡CORRECTO!';
+    result.style.color = 'green';
+    playSuccessSound();
+  } else {
+    result.textContent = `INCORRECTO — Era: ${correct.name}`;
+    result.style.color = 'red';
+    playErrorSound();
+  }
+  // bloquear botones
+  document.querySelectorAll('.opt').forEach(b=>b.disabled=true);
+  // pasar a la siguiente después de 3 segundos
+  setTimeout(()=>{
+    currentIndex += 1;
+    document.querySelectorAll('.opt').forEach(b=>b.disabled=false);
+    result.textContent = '';
+    showQuestion();
+  }, 3000);
+} document.getElementById('opt0').textContent = options[0].name;
   document.getElementById('opt1').textContent = options[1].name;
   document.getElementById('opt2').textContent = options[2].name;
   document.getElementById('opt3').textContent = options[3].name;

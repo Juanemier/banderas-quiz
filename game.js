@@ -84,14 +84,15 @@ function showQuestion(){
   if(currentIndex >= pool.length){ endGame(); return; }
   const item = pool[currentIndex];
   flagImg.src = `https://flagcdn.com/w320/${item.code}.png`;
-  // Generar 3 opciones (1 correcta + 2 aleatorias)
+  // Generar 4 opciones (1 correcta + 3 aleatorias)
   let others = countries.filter(c => c.name !== item.name);
   shuffle(others);
-  options = [item, others[0], others[1]];
+  options = [item, others[0], others[1], others[2]];
   shuffle(options);
   document.getElementById('opt0').textContent = options[0].name;
   document.getElementById('opt1').textContent = options[1].name;
   document.getElementById('opt2').textContent = options[2].name;
+  document.getElementById('opt3').textContent = options[3].name;
   info.textContent = `Pregunta ${currentIndex+1} de ${pool.length} — Puntos: ${score}`;
 }
 
@@ -158,6 +159,7 @@ document.getElementById('reset-ranking').addEventListener('click', resetRanking)
 document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
 document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
 document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));
+document.getElementById('opt3').addEventListener('click', ()=>handleChoice(3));
 
 // Inicializar UI
 renderTop3();

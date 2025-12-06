@@ -151,11 +151,8 @@ function renderTop10(){
   alert('Top 10:\n'+txt);
 }
 
-function resetRanking(){ if(confirm('Borrar ranking (Top 10)?')){ ranking = []; localStorage.removeItem('ranking_v1'); renderTop3(); alert('Ranking borrado'); }}
-
 // Event listeners
 document.getElementById('start').addEventListener('click', startGame);
-document.getElementById('reset-ranking').addEventListener('click', resetRanking);
 document.getElementById('opt0').addEventListener('click', ()=>handleChoice(0));
 document.getElementById('opt1').addEventListener('click', ()=>handleChoice(1));
 document.getElementById('opt2').addEventListener('click', ()=>handleChoice(2));

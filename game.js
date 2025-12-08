@@ -4,6 +4,7 @@
 
 // Cache DOM elements
 const elements = {
+  startScreen: document.getElementById('start-screen'),
   flagImg: document.getElementById('flag-img'),
   info: document.getElementById('info'),
   result: document.getElementById('result'),
@@ -18,6 +19,9 @@ const GAME_SETTINGS = {
   feedbackDelay: 3000,
   endGameDelay: 200
 };
+
+// Storage key for rankings
+const RANKING_KEY = 'banderas_ranking';
 
 // Sound elements
 let successSound, errorSound;
@@ -104,24 +108,32 @@ const countries = [
 
 let pool = [], currentIndex = 0, score = 0, options = [];
 let ranking = [];
-// Compute API_URL dynamically so mobile devices can use the same host when
-// the page is opened via http://<host>:<port>
-let API_URL;
-if(location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'){
-  API_URL = 'http://localhost:3000';
-} else {
-  // Use the page's hostname (works when you serve the static files from the same machine
-  // and access them via http://<DESKTOP_IP>:8000 on your mobile device)
-  API_URL = location.protocol + '//' + location.hostname + ':3000';
-}
+
 function setStartText(text) {
   if (elements.startBtn) elements.startBtn.textContent = text;
 }
 
+function showStartScreen() {
+  elements.startScreen.style.display = 'block';
+  elements.flagImg.style.display = 'none';
+  document.getElementById('options').style.display = 'none';
+  elements.result.style.display = 'none';
+  elements.info.textContent = 'Pulsa JUGAR para comenzar';
+  elements.startBtn.textContent = 'JUGAR';
+  elements.startBtn.style.display = 'inline-block';
+}
+
+function hideStartScreen() {
+  elements.startScreen.style.display = 'none';
+  elements.flagImg.style.display = 'block';
+  document.getElementById('options').style.display = 'grid';
+  elements.result.style.display = 'block';
+}
+
 function showStart(text = 'JUGAR') {
   if (elements.startBtn) {
-    elements.startBtn.style.display = 'inline-block';
     elements.startBtn.textContent = text;
+    elements.startBtn.style.display = 'inline-block';
   }
 }
 
@@ -142,14 +154,13 @@ function shuffle(arr) {
 }
 
 function startGame() {
+  hideStartScreen();
   pool = [...countries];
   shuffle(pool);
   pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
   currentIndex = 0;
   score = 0;
-  elements.result.textContent = '';
   elements.info.textContent = `Pregunta 1 de ${pool.length}`;
-  hideStart();
   setOptionsEnabled(true);
   renderTop3();
   showQuestion();
@@ -215,28 +226,30 @@ function endGame() {
   
   setTimeout(() => {
     const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
-    if(name){
-      fetch(API_URL + '/api/ranking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, score: score, total: pool.length })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data.success){
-          ranking = data.ranking;
-        }
-      })
-      .catch(err => console.error('Error al enviar ranking:', err))
-      .finally(() => {
-        renderTop3();
-        renderTop10();
-        showStart();
+    if (name) {
+      // Add to ranking
+      ranking.push({
+        name: name,
+        score: score,
+        total: pool.length,
+        date: new Date().toISOString()
       });
+      
+      // Sort by score (descending) and keep only top 10
+      ranking.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+      ranking = ranking.slice(0, 10);
+      
+      // Save to localStorage
+      saveRanking();
+      
+      // Update UI
+      renderTop3();
+      renderTop10();
+      showStartScreen();
     } else {
       renderTop3();
       renderTop10();
-      showStart('Volver a jugar');
+      showStartScreen();
     }
   }, 200);
 }
@@ -257,19 +270,30 @@ function renderTop10() {
   if (ranking.length === 0) return;
   const txt = ranking
     .slice(0, 10)
-    .map((e, i) => `${i + 1}. ${e.name} — ${e.score}/${e.total}`)
+    .map((e, i) => {
+      const date = new Date(e.date).toLocaleDateString();
+      return `${i + 1}. ${e.name} — ${e.score}/${e.total} (${date})`;
+    })
     .join('\n');
   alert(`Top 10:\n${txt}`);
 }
 
 async function loadRanking() {
   try {
-    const res = await fetch(`${API_URL}/api/ranking`);
-    ranking = await res.json();
+    const savedRanking = localStorage.getItem(RANKING_KEY);
+    ranking = savedRanking ? JSON.parse(savedRanking) : [];
     renderTop3();
   } catch (err) {
     console.error('Error cargando ranking:', err);
     ranking = [];
+  }
+}
+
+function saveRanking() {
+  try {
+    localStorage.setItem(RANKING_KEY, JSON.stringify(ranking));
+  } catch (err) {
+    console.error('Error guardando ranking:', err);
   }
 }
 
@@ -292,6 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   loadRanking();
-  elements.info.textContent = 'Pulsa JUGAR para comenzar';
+  showStartScreen();
   elements.startBtn?.addEventListener('click', startGame);
 });

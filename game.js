@@ -233,10 +233,15 @@ function startGame() {
     // Hide the start button when game starts
     if (elements.startBtn) {
       elements.startBtn.style.display = 'none';
+      console.log('Start button hidden');
     }
     
     // Initialize game state
     pool = [...countries];
+    if (pool.length === 0) {
+      throw new Error('No se encontraron países para jugar');
+    }
+    
     shuffle(pool);
     pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
     currentIndex = 0;
@@ -257,6 +262,12 @@ function startGame() {
       elements.result.style.display = 'block';
     }
     
+    // Make sure the flag area is visible
+    if (elements.flagImg && elements.flagImg.parentElement) {
+      elements.flagImg.parentElement.style.display = 'block';
+      elements.flagImg.style.display = 'block';
+    }
+    
     // Enable options and start the game
     setOptionsEnabled(true);
     renderTop3();
@@ -265,9 +276,21 @@ function startGame() {
     console.log('Game started successfully');
   } catch (error) {
     console.error('Error in startGame:', error);
+    
+    // Show error message
     if (elements.info) {
-      elements.info.textContent = 'Error al iniciar el juego. Por favor, recarga la página.';
+      elements.info.textContent = `Error: ${error.message || 'Error al iniciar el juego'}`;
+      elements.info.style.color = '#e74c3c';
     }
+    
+    // Make sure the start button is visible again
+    if (elements.startBtn) {
+      elements.startBtn.textContent = 'INTENTAR DE NUEVO';
+      elements.startBtn.style.display = 'inline-block';
+    }
+    
+    // Show start screen if there was an error
+    showStartScreen();
   }
 }
 

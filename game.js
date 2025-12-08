@@ -19,26 +19,35 @@ const GAME_SETTINGS = {
   endGameDelay: 200
 };
 
-// Sound functions
-function playSound(frequency, duration) {
+// Sound elements
+let successSound, errorSound;
+
+function initSounds() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = frequency;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (duration / 1000));
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + (duration / 1000));
+    successSound = new Audio('si.wav');
+    errorSound = new Audio('no.wav');
+    
+    // Preload sounds
+    successSound.load();
+    errorSound.load();
   } catch (e) {
-    console.warn('Audio not supported', e);
+    console.warn('Error initializing sounds:', e);
   }
 }
 
-const playSuccessSound = () => playSound(800, 300);
-const playErrorSound = () => playSound(300, 400);
+function playSuccessSound() {
+  if (successSound) {
+    successSound.currentTime = 0; // Rewind to the start
+    successSound.play().catch(e => console.warn('Error playing success sound:', e));
+  }
+}
+
+function playErrorSound() {
+  if (errorSound) {
+    errorSound.currentTime = 0; // Rewind to the start
+    errorSound.play().catch(e => console.warn('Error playing error sound:', e));
+  }
+}
 
 const countries = [
   { name: "Afganistán", code: "af" }, { name: "Albania", code: "al" }, { name: "Alemania", code: "de" }, { name: "Andorra", code: "ad" }, { name: "Angola", code: "ao" },
@@ -266,6 +275,9 @@ async function loadRanking() {
 
 // Esperar a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize sounds
+  initSounds();
+  
   // Add data-index attributes to option buttons
   elements.options.forEach((btn, index) => {
     btn.dataset.index = index;

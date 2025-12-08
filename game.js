@@ -170,14 +170,37 @@ function showStartScreen() {
 }
 
 function hideStartScreen() {
-  // Hide start screen
-  elements.startScreen.style.display = 'none';
-  
-  // Show game elements
-  elements.flagImg.style.display = 'block';
-  elements.flagImg.parentElement.style.display = 'block'; // Show flag area container
-  document.getElementById('options').style.display = 'grid';
-  elements.result.style.display = 'block';
+  try {
+    console.log('Hiding start screen and showing game elements...');
+    
+    // Hide start screen
+    if (elements.startScreen) {
+      elements.startScreen.style.display = 'none';
+    }
+    
+    // Show game elements
+    if (elements.flagImg && elements.flagImg.parentElement) {
+      elements.flagImg.parentElement.style.display = 'block';
+      elements.flagImg.style.display = 'block';
+    }
+    
+    const optionsContainer = document.getElementById('options');
+    if (optionsContainer) {
+      optionsContainer.style.display = 'grid';
+    }
+    
+    if (elements.result) {
+      elements.result.style.display = 'block';
+    }
+    
+    if (elements.info) {
+      elements.info.style.display = 'block';
+    }
+    
+    console.log('Game elements should now be visible');
+  } catch (error) {
+    console.error('Error in hideStartScreen:', error);
+  }
 }
 
 function showStart(text = 'JUGAR') {
@@ -204,29 +227,55 @@ function shuffle(arr) {
 }
 
 function startGame() {
-  // Hide start screen and show game elements
-  hideStartScreen();
-  
-  // Initialize game state
-  pool = [...countries];
-  shuffle(pool);
-  pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
-  currentIndex = 0;
-  score = 0;
-  
-  // Update UI
-  elements.info.textContent = `Pregunta 1 de ${pool.length}`;
-  elements.result.textContent = '';
-  elements.result.className = 'result';
-  
-  // Enable options and start the game
-  setOptionsEnabled(true);
-  renderTop3();
-  showQuestion();
+  try {
+    console.log('Starting game...');
+    
+    // Initialize game state
+    pool = [...countries];
+    shuffle(pool);
+    pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
+    currentIndex = 0;
+    score = 0;
+    
+    // Show game elements
+    hideStartScreen();
+    
+    // Update UI
+    if (elements.info) {
+      elements.info.textContent = `Pregunta 1 de ${pool.length}`;
+      elements.info.style.display = 'block';
+    }
+    
+    if (elements.result) {
+      elements.result.textContent = '';
+      elements.result.className = 'result';
+      elements.result.style.display = 'block';
+    }
+    
+    // Enable options and start the game
+    setOptionsEnabled(true);
+    renderTop3();
+    showQuestion();
+    
+    console.log('Game started successfully');
+  } catch (error) {
+    console.error('Error in startGame:', error);
+    if (elements.info) {
+      elements.info.textContent = 'Error al iniciar el juego. Por favor, recarga la página.';
+    }
+  }
 }
 
 function showQuestion() {
+  console.log('Showing question', currentIndex + 1, 'of', pool.length);
+  
+  if (!pool || pool.length === 0) {
+    console.error('No questions available in the pool');
+    return;
+  }
+  
   if (currentIndex >= pool.length) {
+    console.log('End of questions reached, ending game');
     endGame();
     return;
   }

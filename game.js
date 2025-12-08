@@ -16,11 +16,18 @@ const elements = {
 // Game settings
 const GAME_SETTINGS = {
   questionsPerGame: 25,
-  feedbackDelay: 2000,  // Reduced from 3000ms to 2000ms (3s to 2s)
-  endGameDelay: 200
+  feedbackDelay: 2000,
+  endGameDelay: 200,
+  api: {
+    baseUrl: 'http://localhost:3000/api', // Update with your server URL
+    endpoints: {
+      getRanking: '/ranking',
+      saveScore: '/score'
+    }
+  }
 };
 
-// Storage key for rankings
+// Storage key for local fallback
 const RANKING_KEY = 'banderas_ranking';
 
 // Sound elements
@@ -404,7 +411,7 @@ function endGame() {
 function renderTop3() {
   const top = ranking.slice(0, 3);
   if (top.length === 0) {
-    elements.top3.innerHTML = '<h4>Ranking</h4><em>No hay top aún</em>';
+    elements.top3.innerHTML = '<h4>Ranking</h4><em>No hay puntuaciones aún</em>';
     return;
   }
   const lines = top.map((e, i) => 
@@ -414,38 +421,141 @@ function renderTop3() {
 }
 
 function renderTop10() {
-  if (ranking.length === 0) return;
-  const txt = ranking
-    .slice(0, 10)
+  if (ranking.length === 0) {
+    alert('No hay puntuaciones disponibles');
+    return;
+  }
+  const top10 = ranking.slice(0, 10);
+  const txt = top10
     .map((e, i) => {
       const date = new Date(e.date).toLocaleDateString();
       return `${i + 1}. ${e.name} — ${e.score}/${e.total} (${date})`;
     })
     .join('\n');
+  
   alert(`Top 10:\n${txt}`);
 }
 
 async function loadRanking() {
   try {
+    // Try to get from server first
+    const response = await fetchWithTimeout(
+      `${GAME_SETTINGS.api.baseUrl}${GAME_SETTINGS.api.endpoints.getRanking}`
+    );
+    
+    if (response.ok) {
+      const serverRanking = await response.json();
+      ranking = serverRanking;
+    } else {
+      // Fallback to local storage
+      const savedRanking = localStorage.getItem(RANKING_KEY);
+      ranking = savedRanking ? JSON.parse(savedRanking) : [];
+    }
+    
+    renderTop3();
+  } catch (error) {
+    console.error('Error cargando ranking:', error);
     const savedRanking = localStorage.getItem(RANKING_KEY);
     ranking = savedRanking ? JSON.parse(savedRanking) : [];
     renderTop3();
-  } catch (err) {
-    console.error('Error cargando ranking:', err);
-    ranking = [];
   }
 }
 
-function saveRanking() {
+async function saveRanking(scoreData) {
   try {
-    localStorage.setItem(RANKING_KEY, JSON.stringify(ranking));
-  } catch (err) {
-    console.error('Error guardando ranking:', err);
+    const response = await fetchWithTimeout(
+      `${GAME_SETTINGS.api.baseUrl}${GAME_SETTINGS.api.endpoints.saveScore}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(scoreData)
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Error del servidor');
+    }
+
+    const result = await response.json();
+    console.log('Puntuación guardada:', result);
+    return result;
+  } catch (error) {
+    console.error('Error al guardar en el servidor:', error);
+    // Fallback to local storage
+    const localRanking = JSON.parse(localStorage.getItem(RANKING_KEY) || '[]');
+    localRanking.push(scoreData);
+    localStorage.setItem(RANKING_KEY, JSON.stringify(localRanking));
+    throw error;
+  }
+}
+
+async function fetchWithTimeout(resource, options = {}) {
+  const { timeout = 5000 } = options;
+  
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal  
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
+// Update endGame function to use the new saveRanking
+async function endGame() {
+  elements.info.textContent = `Fin. Has acertado ${score} de ${pool.length}`;
+  elements.flagImg.src = '';
+  elements.options.forEach(btn => btn.textContent = '');
+  setOptionsEnabled(false);
+  
+  try {
+    const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
+    if (name) {
+      const scoreData = {
+        name: name,
+        score: score,
+        total: pool.length,
+        date: new Date().toISOString()
+      };
+
+      // Save to server
+      await saveRanking(scoreData);
+      
+      // Update local ranking
+      ranking.push(scoreData);
+      ranking.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+      ranking = ranking.slice(0, 10);
+      
+      // Update UI
+      renderTop3();
+      renderTop10();
+      showStartScreen();
+    } else {
+      // User cancelled name input
+      renderTop3();
+      renderTop10();
+      showStartScreen();
+    }
+  } catch (error) {
+    console.error('Error al guardar la puntuación:', error);
+    alert('No se pudo guardar la puntuación en el servidor. Se guardó localmente.');
+    renderTop3();
+    renderTop10();
+    showStartScreen();
   }
 }
 
 // Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   try {
     // Initialize sounds
     initSounds();
@@ -454,6 +564,12 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.options.forEach((btn, index) => {
       btn.dataset.index = index;
     });
+    
+    // Load initial ranking
+    await loadRanking();
+    
+    // Show start screen
+    showStartScreen();
     
     // Single event listener for all option buttons using event delegation
     document.querySelector('.options-container')?.addEventListener('click', (e) => {

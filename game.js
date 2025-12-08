@@ -16,7 +16,7 @@ const elements = {
 // Game settings
 const GAME_SETTINGS = {
   questionsPerGame: 25,
-  feedbackDelay: 3000,
+  feedbackDelay: 2000,  // Reduced from 3000ms to 2000ms (3s to 2s)
   endGameDelay: 200
 };
 

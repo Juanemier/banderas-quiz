@@ -126,6 +126,34 @@
       font-size: 14px;
     }
 
+    /* Start screen styles */
+    .start-screen {
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .start-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .start-screen p {
+      font-size: 1.2em;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    /* Hide game elements initially */
+    #flag-area,
+    #options,
+    #result {
+      display: none;
+    }
+
     /* Responsive design */
     @media (max-width: 600px) {
       .options-container {
@@ -146,6 +174,10 @@
     </header>
 
     <main>
+      <div id="start-screen" class="start-screen">
+        <img src="banderas.jpg" alt="Banderas del Mundo" class="start-image">
+        <p>¿Listo para poner a prueba tus conocimientos de banderas?</p>
+      </div>
       <div id="info">Pulsa JUGAR para comenzar</div>
 
       <div id="flag-area">

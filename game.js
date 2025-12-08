@@ -114,18 +114,31 @@ function setStartText(text) {
 }
 
 function showStartScreen() {
+  // Show start screen elements
   elements.startScreen.style.display = 'block';
+  
+  // Hide game elements
   elements.flagImg.style.display = 'none';
+  elements.flagImg.parentElement.style.display = 'none'; // Hide flag area container
   document.getElementById('options').style.display = 'none';
   elements.result.style.display = 'none';
+  
+  // Update UI text
   elements.info.textContent = 'Pulsa JUGAR para comenzar';
   elements.startBtn.textContent = 'JUGAR';
   elements.startBtn.style.display = 'inline-block';
+  
+  // Show top 3 scores
+  renderTop3();
 }
 
 function hideStartScreen() {
+  // Hide start screen
   elements.startScreen.style.display = 'none';
+  
+  // Show game elements
   elements.flagImg.style.display = 'block';
+  elements.flagImg.parentElement.style.display = 'block'; // Show flag area container
   document.getElementById('options').style.display = 'grid';
   elements.result.style.display = 'block';
 }
@@ -154,13 +167,22 @@ function shuffle(arr) {
 }
 
 function startGame() {
+  // Hide start screen and show game elements
   hideStartScreen();
+  
+  // Initialize game state
   pool = [...countries];
   shuffle(pool);
   pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
   currentIndex = 0;
   score = 0;
+  
+  // Update UI
   elements.info.textContent = `Pregunta 1 de ${pool.length}`;
+  elements.result.textContent = '';
+  elements.result.className = 'result';
+  
+  // Enable options and start the game
   setOptionsEnabled(true);
   renderTop3();
   showQuestion();
@@ -297,25 +319,34 @@ function saveRanking() {
   }
 }
 
-// Esperar a que el DOM esté listo
+// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize sounds
-  initSounds();
-  
-  // Add data-index attributes to option buttons
-  elements.options.forEach((btn, index) => {
-    btn.dataset.index = index;
-  });
-  
-  // Single event listener for all option buttons
-  document.querySelector('.options-container')?.addEventListener('click', (e) => {
-    const button = e.target.closest('.opt');
-    if (button) {
-      handleChoice(parseInt(button.dataset.index));
-    }
-  });
+  try {
+    // Initialize sounds
+    initSounds();
+    
+    // Add data-index attributes to option buttons
+    elements.options.forEach((btn, index) => {
+      btn.dataset.index = index;
+    });
+    
+    // Single event listener for all option buttons using event delegation
+    document.querySelector('.options-container')?.addEventListener('click', (e) => {
+      const button = e.target.closest('.opt');
+      if (button && !button.disabled) {
+        handleChoice(parseInt(button.dataset.index));
+      }
+    });
 
-  loadRanking();
-  showStartScreen();
-  elements.startBtn?.addEventListener('click', startGame);
+    // Load ranking and show start screen
+    loadRanking();
+    showStartScreen();
+    
+    // Start game button event listener
+    elements.startBtn?.addEventListener('click', startGame);
+    
+  } catch (error) {
+    console.error('Error initializing game:', error);
+    elements.info.textContent = 'Error al inicializar el juego. Por favor, recarga la página.';
+  }
 });

@@ -114,22 +114,59 @@ function setStartText(text) {
 }
 
 function showStartScreen() {
-  // Show start screen elements
-  elements.startScreen.style.display = 'block';
-  
-  // Hide game elements
-  elements.flagImg.style.display = 'none';
-  elements.flagImg.parentElement.style.display = 'none'; // Hide flag area container
-  document.getElementById('options').style.display = 'none';
-  elements.result.style.display = 'none';
-  
-  // Update UI text
-  elements.info.textContent = 'Pulsa JUGAR para comenzar';
-  elements.startBtn.textContent = 'JUGAR';
-  elements.startBtn.style.display = 'inline-block';
-  
-  // Show top 3 scores
-  renderTop3();
+  try {
+    console.log('Showing start screen...');
+    
+    // Show start screen elements
+    if (elements.startScreen) {
+      elements.startScreen.style.display = 'block';
+      
+      // Ensure the image element exists and has the correct path
+      const startImage = elements.startScreen.querySelector('.start-image');
+      if (startImage) {
+        console.log('Start image element found, src:', startImage.src);
+        // Force reload the image in case of caching issues
+        startImage.src = 'banderas.jpg';
+      } else {
+        console.error('Start image element not found in start screen');
+      }
+    } else {
+      console.error('Start screen element not found');
+    }
+    
+    // Hide game elements
+    if (elements.flagImg) {
+      elements.flagImg.style.display = 'none';
+      if (elements.flagImg.parentElement) {
+        elements.flagImg.parentElement.style.display = 'none'; // Hide flag area container
+      }
+    }
+    
+    const optionsContainer = document.getElementById('options');
+    if (optionsContainer) {
+      optionsContainer.style.display = 'none';
+    }
+    
+    if (elements.result) {
+      elements.result.style.display = 'none';
+    }
+    
+    // Update UI text
+    if (elements.info) {
+      elements.info.textContent = 'Pulsa JUGAR para comenzar';
+    }
+    
+    if (elements.startBtn) {
+      elements.startBtn.textContent = 'JUGAR';
+      elements.startBtn.style.display = 'inline-block';
+    }
+    
+    // Show top 3 scores
+    renderTop3();
+    
+  } catch (error) {
+    console.error('Error in showStartScreen:', error);
+  }
 }
 
 function hideStartScreen() {

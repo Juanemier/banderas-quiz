@@ -2,6 +2,44 @@
 // Usa flagcdn.com para buscar banderas por código alpha-2
 // 240+ países y territorios mundiales
 
+// Cache DOM elements
+const elements = {
+  flagImg: document.getElementById('flag-img'),
+  info: document.getElementById('info'),
+  result: document.getElementById('result'),
+  top3: document.getElementById('top3'),
+  startBtn: document.getElementById('start'),
+  options: Array.from(document.querySelectorAll('.opt'))
+};
+
+// Game settings
+const GAME_SETTINGS = {
+  questionsPerGame: 25,
+  feedbackDelay: 3000,
+  endGameDelay: 200
+};
+
+// Sound functions
+function playSound(frequency, duration) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = frequency;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (duration / 1000));
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + (duration / 1000));
+  } catch (e) {
+    console.warn('Audio not supported', e);
+  }
+}
+
+const playSuccessSound = () => playSound(800, 300);
+const playErrorSound = () => playSound(300, 400);
+
 const countries = [
   { name: "Afganistán", code: "af" }, { name: "Albania", code: "al" }, { name: "Alemania", code: "de" }, { name: "Andorra", code: "ad" }, { name: "Angola", code: "ao" },
   { name: "Anguila", code: "ai" }, { name: "Antártida", code: "aq" }, { name: "Antigua y Barbuda", code: "ag" }, { name: "Arabia Saudita", code: "sa" }, { name: "Argelia", code: "dz" },
@@ -67,127 +105,105 @@ if(location.protocol === 'file:' || location.hostname === 'localhost' || locatio
   // and access them via http://<DESKTOP_IP>:8000 on your mobile device)
   API_URL = location.protocol + '//' + location.hostname + ':3000';
 }
-const flagImg = document.getElementById('flag-img');
-const info = document.getElementById('info');
-const result = document.getElementById('result');
-const top3 = document.getElementById('top3');
-const startBtn = () => document.getElementById('start');
-
-function setStartText(text){
-  const btn = startBtn();
-  if(btn) btn.textContent = text;
+function setStartText(text) {
+  if (elements.startBtn) elements.startBtn.textContent = text;
 }
 
-function showStart(text = 'JUGAR'){
-  const btn = startBtn();
-  if(btn){ btn.style.display = 'inline-block'; btn.textContent = text; }
-}
-
-function hideStart(){
-  const btn = startBtn();
-  if(btn) btn.style.display = 'none';
-}
-
-function setOptionsEnabled(enabled){
-  document.querySelectorAll('.opt').forEach(b => b.disabled = !enabled);
-}
-
-function shuffle(arr){
-  for(let i=arr.length-1; i>0; i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+function showStart(text = 'JUGAR') {
+  if (elements.startBtn) {
+    elements.startBtn.style.display = 'inline-block';
+    elements.startBtn.textContent = text;
   }
 }
 
-function playSuccessSound(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 800;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.3);
-  }catch(e){}
+function hideStart() {
+  if (elements.startBtn) elements.startBtn.style.display = 'none';
 }
 
-function playErrorSound(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 300;
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  }catch(e){}
+function setOptionsEnabled(enabled) {
+  elements.options.forEach(btn => btn.disabled = !enabled);
 }
 
-function startGame(){
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGame() {
   pool = [...countries];
   shuffle(pool);
-  pool = pool.slice(0, 25);
+  pool = pool.slice(0, GAME_SETTINGS.questionsPerGame);
   currentIndex = 0;
   score = 0;
-  result.textContent = '';
-  info.textContent = `Pregunta 1 de ${pool.length}`;
+  elements.result.textContent = '';
+  elements.info.textContent = `Pregunta 1 de ${pool.length}`;
   hideStart();
   setOptionsEnabled(true);
   renderTop3();
   showQuestion();
 }
 
-function showQuestion(){
-  if(currentIndex >= pool.length){ endGame(); return; }
+function showQuestion() {
+  if (currentIndex >= pool.length) {
+    endGame();
+    return;
+  }
+  
   const item = pool[currentIndex];
-  flagImg.src = `https://flagcdn.com/w320/${item.code}.png`;
-  let others = countries.filter(c => c.name !== item.name);
-  shuffle(others);
-  options = [item, others[0], others[1], others[2]];
+  elements.flagImg.src = `https://flagcdn.com/w320/${item.code}.png`;
+  
+  // Get 3 random incorrect options
+  const others = countries
+    .filter(c => c.name !== item.name)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+  
+  options = [item, ...others];
   shuffle(options);
-  document.getElementById('opt0').textContent = options[0].name;
-  document.getElementById('opt1').textContent = options[1].name;
-  document.getElementById('opt2').textContent = options[2].name;
-  document.getElementById('opt3').textContent = options[3].name;
-  info.textContent = `Pregunta ${currentIndex+1} de ${pool.length} — Puntos: ${score}`;
+  
+  // Update option buttons
+  elements.options.forEach((btn, i) => {
+    btn.textContent = options[i].name;
+  });
+  
+  elements.info.textContent = `Pregunta ${currentIndex + 1} de ${pool.length} — Puntos: ${score}`;
 }
 
-function handleChoice(i){
-  const chosen = options[i];
+function handleChoice(choiceIndex) {
+  const chosen = options[choiceIndex];
   const correct = pool[currentIndex];
-  if(chosen.name === correct.name){
-    score += 1;
-    result.textContent = '¡CORRECTO!';
-    result.style.color = 'green';
+  
+  if (chosen.name === correct.name) {
+    score++;
+    elements.result.textContent = '¡CORRECTO!';
+    elements.result.className = 'result success';
     playSuccessSound();
   } else {
-    result.textContent = `INCORRECTO — Era: ${correct.name}`;
-    result.style.color = 'red';
+    elements.result.textContent = `INCORRECTO — Era: ${correct.name}`;
+    elements.result.className = 'result error';
     playErrorSound();
   }
-  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+
+  setOptionsEnabled(false);
+  
   setTimeout(() => {
-    currentIndex += 1;
-    document.querySelectorAll('.opt').forEach(b => b.disabled = false);
-    result.textContent = '';
+    currentIndex++;
+    elements.result.textContent = '';
+    elements.result.className = 'result';
+    setOptionsEnabled(true);
     showQuestion();
-  }, 3000);
+  }, GAME_SETTINGS.feedbackDelay);
 }
 
-function endGame(){
-  info.textContent = `Fin. Has acertado ${score} de ${pool.length}`;
-  flagImg.src = '';
-  document.getElementById('opt0').textContent = '';
-  document.getElementById('opt1').textContent = '';
-  document.getElementById('opt2').textContent = '';
-  document.getElementById('opt3').textContent = '';
+function endGame() {
+  elements.info.textContent = `Fin. Has acertado ${score} de ${pool.length}`;
+  elements.flagImg.src = '';
+  elements.options.forEach(btn => btn.textContent = '');
   setOptionsEnabled(false);
+  
   setTimeout(() => {
     const name = prompt('Introduce tu nombre para el ranking (Top 10):', 'Jugador');
     if(name){
@@ -216,28 +232,33 @@ function endGame(){
   }, 200);
 }
 
-function renderTop3(){
+function renderTop3() {
   const top = ranking.slice(0, 3);
-  if(top.length === 0){
-    top3.innerHTML = '<h4>Ranking</h4><em>No hay top aún</em>';
+  if (top.length === 0) {
+    elements.top3.innerHTML = '<h4>Ranking</h4><em>No hay top aún</em>';
     return;
   }
-  const lines = top.map((e, i) => `<strong>${i+1}.</strong> ${e.name} — ${e.score}/${e.total}`);
-  top3.innerHTML = `<h4>Ranking</h4>` + lines.join('<br>');
+  const lines = top.map((e, i) => 
+    `<strong>${i + 1}.</strong> ${e.name} — ${e.score}/${e.total}`
+  );
+  elements.top3.innerHTML = `<h4>Ranking</h4>${lines.join('<br>')}`;
 }
 
-function renderTop10(){
-  if(ranking.length === 0) return;
-  const txt = ranking.map((e, i) => `${i+1}. ${e.name} — ${e.score}/${e.total}`).join('\n');
-  alert('Top 10:\n' + txt);
+function renderTop10() {
+  if (ranking.length === 0) return;
+  const txt = ranking
+    .slice(0, 10)
+    .map((e, i) => `${i + 1}. ${e.name} — ${e.score}/${e.total}`)
+    .join('\n');
+  alert(`Top 10:\n${txt}`);
 }
 
-async function loadRanking(){
-  try{
-    const res = await fetch(API_URL + '/api/ranking');
+async function loadRanking() {
+  try {
+    const res = await fetch(`${API_URL}/api/ranking`);
     ranking = await res.json();
     renderTop3();
-  }catch(err){
+  } catch (err) {
     console.error('Error cargando ranking:', err);
     ranking = [];
   }
@@ -245,11 +266,20 @@ async function loadRanking(){
 
 // Esperar a que el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+  // Add data-index attributes to option buttons
+  elements.options.forEach((btn, index) => {
+    btn.dataset.index = index;
+  });
+  
+  // Single event listener for all option buttons
+  document.querySelector('.options-container')?.addEventListener('click', (e) => {
+    const button = e.target.closest('.opt');
+    if (button) {
+      handleChoice(parseInt(button.dataset.index));
+    }
+  });
+
   loadRanking();
-  info.textContent = 'Pulsa JUGAR para comenzar';
-  document.getElementById('start').addEventListener('click', startGame);
-  document.getElementById('opt0').addEventListener('click', () => handleChoice(0));
-  document.getElementById('opt1').addEventListener('click', () => handleChoice(1));
-  document.getElementById('opt2').addEventListener('click', () => handleChoice(2));
-  document.getElementById('opt3').addEventListener('click', () => handleChoice(3));
+  elements.info.textContent = 'Pulsa JUGAR para comenzar';
+  elements.startBtn?.addEventListener('click', startGame);
 });

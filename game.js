@@ -230,6 +230,11 @@ function startGame() {
   try {
     console.log('Starting game...');
     
+    // Hide the start button when game starts
+    if (elements.startBtn) {
+      elements.startBtn.style.display = 'none';
+    }
+    
     // Initialize game state
     pool = [...countries];
     shuffle(pool);
@@ -350,11 +355,22 @@ function endGame() {
       // Save to localStorage
       saveRanking();
       
+      // Show the start button again with 'JUGAR DE NUEVO' text
+      if (elements.startBtn) {
+        elements.startBtn.textContent = 'JUGAR DE NUEVO';
+        elements.startBtn.style.display = 'inline-block';
+      }
+      
       // Update UI
       renderTop3();
       renderTop10();
       showStartScreen();
     } else {
+      // Show the start button again even if user cancels name input
+      if (elements.startBtn) {
+        elements.startBtn.textContent = 'JUGAR';
+        elements.startBtn.style.display = 'inline-block';
+      }
       renderTop3();
       renderTop10();
       showStartScreen();

@@ -43,18 +43,25 @@
 
     #flag-area {
       text-align: center;
-      margin: 20px 0;
-      min-height: 160px;
+      margin: 20px auto;
+      max-width: 100%;
+      min-height: 200px;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
     }
 
     #flag-img {
       max-width: 100%;
-      max-height: 120px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      max-height: 180px;
+      margin: 0 auto;
+      display: block;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     .options-container {
@@ -92,16 +99,31 @@
     #start {
       padding: 12px 30px;
       font-size: 18px;
+      font-weight: 600;
       background: #3498db;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
+      margin: 20px auto;
+      display: block;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     #start:hover {
       background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    #start:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hidden {
+      display: none !important;
     }
 
     #result {
@@ -170,7 +192,12 @@
       }
       
       #flag-img {
-        max-height: 100px;
+        max-height: 150px;
+      }
+      
+      #start {
+        width: 100%;
+        padding: 12px;
       }
     }
   </style>
